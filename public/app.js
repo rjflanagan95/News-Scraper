@@ -1,11 +1,67 @@
-// Grab the articles as a json
+// We'll be rewriting the table's data frequently, so let's make our code more DRY
+// by writing a function that takes in 'animals' (JSON) and creates a table body
+function displayResults(articles) {
+  // First, empty the table
+  $("#articles").empty();
+
+  // Then, for each entry of that json...
+  articles.forEach(function(article) {
+    // Append each of the animal's properties to the table
+    var newArticle = $("<cardbody>").append(
+      $("<h2>").text(article.headline),
+      $("<h5>").text(article.author),
+      $("<p>").text(article.description),
+      // $("<td>").text(animal.weight),
+      // $("<td>").text(animal.whatIWouldReallyCallIt)
+    );
+
+    $("#articles").append(newArticle);
+  });
+}
+
+// // Bonus function to change "active" header
+// function setActive(selector) {
+//   // remove and apply 'active' class to distinguish which column we sorted by
+//   $("th").removeClass("active");
+//   $(selector).addClass("active");
+// }
+
+// 1: On Load
+// ==========
+
+// First thing: ask the back end for json with all animals
 $.getJSON("/articles", function(data) {
-  // For each one
-  for (var i = 0; i < data.length; i++) {
-    // Display the apropos information on the page
-    $("#articles").append("<p data-id='" + data[i]._id + "'>" + data[i].title + "<br />" + data[i].link + "</p>");
-  }
+  // Call our function to generate a table body
+  displayResults(data);
 });
+
+// // 2: Button Interactions
+// // ======================
+
+// // When user clicks the weight sort button, display table sorted by weight
+// $("#weight-sort").on("click", function() {
+//   // Set new column as currently-sorted (active)
+//   setActive("#animal-weight");
+
+//   // Do an api call to the back end for json with all animals sorted by weight
+//   $.getJSON("/weight", function(data) {
+//     // Call our function to generate a table body
+//     displayResults(data);
+//   });
+// });
+
+// // When user clicks the name sort button, display the table sorted by name
+// $("#name-sort").on("click", function() {
+//   // Set new column as currently-sorted (active)
+//   setActive("#animal-name");
+
+//   // Do an api call to the back end for json with all animals sorted by name
+//   $.getJSON("/name", function(data) {
+//     // Call our function to generate a table body
+//     displayResults(data);
+//   });
+// });
+
 
 
 // Whenever someone clicks a p tag
