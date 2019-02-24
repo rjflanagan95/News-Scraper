@@ -41,8 +41,7 @@ app.get("/scrape", function(req, res) {
 
       result.headline = $(element).find("h2").text();
       result.link = "https://nytimes.com/section/politics"+ $(element).find("a").attr("href");
-      result.image = $(element).find(".toneNews").attr("itemid");
-      result.description = $(element).find("p").text();
+      result.imageURL = $(element).find(".toneNews").attr("itemid");
       const descSplit = $(element).find("p").text().split("By ");
       result.description = descSplit[0];
       result.author = descSplit[1];
@@ -51,16 +50,16 @@ app.get("/scrape", function(req, res) {
       console.log("=================================");
 
 
-      // // Create a new Article using the `result` object built from scraping
-      // db.Article.create(result)
-      //   .then(function(dbArticle) {
-      //     // View the added result in the console
-      //     console.log(dbArticle);
-      //   })
-      //   .catch(function(err) {
-      //     // If an error occurred, log it
-      //     console.log(err);
-      //   });
+      // Create a new Article using the `result` object built from scraping
+      db.Article.create(result)
+        .then(function(dbArticle) {
+          // View the added result in the console
+          console.log(dbArticle);
+        })
+        .catch(function(err) {
+          // If an error occurred, log it
+          console.log(err);
+        });
     });
 
     // Send a message to the client
