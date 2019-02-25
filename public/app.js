@@ -6,6 +6,9 @@ function displayResults(articles) {
     headline.text(article.headline);
     headline.addClass("card-title");
 
+    var link = $("<a>").attr("href", article.link);
+    link.append(headline);
+
     var author = $("<h5>");
     if (article.author) {
       author.text(article.author);
@@ -14,15 +17,15 @@ function displayResults(articles) {
     description.text(article.description);
     description.addClass("card-text");
 
-    var articleImg = $("<img>");
-    articleImg.attr("src", article.imageURL);
-    articleImg.attr("style", "width:165px;height:110px");
+    // var articleImg = $("<img>");
+    // articleImg.attr("src", article.imageURL);
+    // articleImg.attr("style", "width:165px;height:110px");
 
     var cardContents = $("<div>").append(
-      headline,
+      link,
       author,
-      description,
-      articleImg
+      description
+      // articleImg
     );
 
     cardContents.addClass("card-body");
@@ -32,6 +35,7 @@ function displayResults(articles) {
     newArticle.addClass("card");
 
     $("#articles").append(newArticle);
+    $("#articles").append("<br>");
   });
 }
 

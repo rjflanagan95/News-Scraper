@@ -39,7 +39,7 @@ app.get("/scrape", function(req, res) {
       let result = {};
 
       result.headline = $(element).find("h2").text();
-      result.link = "https://nytimes.com/section/politics"+ $(element).find("a").attr("href");
+      result.link = "https://nytimes.com/"+ $(element).find("a").attr("href");
       result.imageURL = $(element).find(".toneNews").attr("itemid");
       const descSplit = $(element).find("p").text().split("By ");
       result.description = descSplit[0];
