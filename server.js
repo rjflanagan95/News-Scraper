@@ -47,15 +47,18 @@ app.get("/scrape", function(req, res) {
 
 
       // Create a new Article using the `result` object built from scraping
-      db.Article.create(result)
-        .then(function(dbArticle) {
-          // View the added result in the console
+      // check if the word is already in the DB
+      db.Article.findOne({ headline : result.headline }).then(function(dbArticle) {
+        if (dbArticle) {
           res.json(dbArticle);
-        })
-        .catch(function(err) {
-          // If an error occurred, log it
-          console.log(err);
-        });
+        } else {
+          db.Article.create(result).then(function(dbArticle) {
+            res.json(dbArticle);
+          }).catch(function(err) {
+            res.json(err);
+          });
+        }
+      });
     });
 
     // Go back to the home page
