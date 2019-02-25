@@ -50,7 +50,7 @@ app.get("/scrape", function(req, res) {
       db.Article.create(result)
         .then(function(dbArticle) {
           // View the added result in the console
-          console.log(dbArticle);
+          res.json(dbArticle);
         })
         .catch(function(err) {
           // If an error occurred, log it
@@ -58,14 +58,13 @@ app.get("/scrape", function(req, res) {
         });
     });
 
-    // Send a message to the client
-    res.send("Scrape Complete");
+    // Go back to the home page
+    res.redirect("/");
   });
 });
 
 // Route for getting all Articles from the db
 app.get("/articles", function(req, res) {
-  // TODO: Finish the route so it grabs all of the articles
   db.Article.find({})
     .then(function(data) {
       res.json(data);
@@ -77,11 +76,6 @@ app.get("/articles", function(req, res) {
 
 // Route for grabbing a specific Article by id, populate it with it's note
 app.get("/articles/:id", function(req, res) {
-  // TODO
-  // ====
-  // Finish the route so it finds one article using the req.params.id,
-  // and run the populate method with "note",
-  // then responds with the article with the note included
   db.Article.findOne({ _id: req.params.id})
     .populate("note")
     .then(function(data) {
@@ -91,6 +85,20 @@ app.get("/articles/:id", function(req, res) {
       res.json(err);
     });
 });
+
+app.get("/clear", function(req, res) {
+  db.Article.remove()
+  .then(function(data) {
+    res.json(data);
+  })
+  .catch(function(err) {
+    res.json(err);
+  });
+
+  res.redirect("/");
+});
+
+
 
 // Start the server
 app.listen(PORT, function() {
