@@ -28,7 +28,12 @@ app.use(express.json());
 app.use(express.static("public"));
 
 // Connect to the Mongo DB
-mongoose.connect("mongodb://localhost/news-scraper", { useNewUrlParser: true });
+
+// If deployed, use the deployed database. Otherwise use the local mongoHeadlines database
+var MONGODB_URI = process.env.MONGODB_URI || "mongodb://localhost/news-scraper";
+
+mongoose.connect(MONGODB_URI, {
+  useNewUrlParser: true });
 
 app.get("/scrape", function(req, res) {
   axios.get("https://www.nytimes.com/section/politics").then(function(response) {
