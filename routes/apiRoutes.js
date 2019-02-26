@@ -9,7 +9,10 @@ var cheerio = require("cheerio");
 module.exports = function(app) {
     app.get("/scrape", function(req, res) {
         axios.get("https://www.nytimes.com/section/politics").then(function(response) {
-          var $ = cheerio.load(response.data);
+          const $ = cheerio.load(response.data);
+
+          const articleFindArray = []
+          let articleArray = []
       
           $(".css-1cp3ece").each(function(i, element) {
             // Save an empty result object
@@ -17,26 +20,44 @@ module.exports = function(app) {
       
             result.headline = $(element).find("h2").text();
             result.link = "https://nytimes.com/"+ $(element).find("a").attr("href");
+            // should try grabbing a different link, this photo is very degraded
             result.imageURL = $(element).find(".toneNews").attr("itemid");
             const descSplit = $(element).find("p").text().split("By ");
             result.description = descSplit[0];
             result.author = descSplit[1];
-      
-      
-            // Create a new Article using the `result` object built from scraping
-            // check if the word is already in the DB
-            db.Article.findOne({ headline : result.headline }).then(function(dbArticle) {
-              if (!dbArticle) {
-                db.Article.create(result).then(function(dbArticle) {
-                    res.redirect("/");
-                }).catch(function(err) {
-                  res.json(err);
-                });
-              } else {
-                  res.redirect("/");
-              }
-            });
+
+            // articleFindArray will be used to execute a series of findOne()
+            articleFindArray.push(db.Article.findOne({ headline : result.headline }));
+            // articleArray will hold the results from the scrape
+            articleArray.push(result);
           });
+
+          // check if any of the scraped articles already exist in the collection
+          Promise.all(articleFindArray).then((articles) => {
+            for (let i = 0; i < articles.length; i++) {
+              // if the article existed, it will be returned as an object; if it didn't exist, it returns as null
+              if (articles[i]) {
+                // if it already existed, we want to filter it out of the results array so it doesn't get re-added
+                articleArray[i] = null;
+              }
+            }
+
+            // filtering the nullified results
+            var filtered = articleArray.filter(function (el) {
+              return el != null;
+            });
+
+            // insert any remaining entries and redirect (refresh) the page
+            db.Article.insertMany(filtered)
+            .then(function(dbArticles) {
+              res.redirect("/");
+            })
+            .catch(function(err) {
+              res.json(err);
+            });
+
+          });
+
         });
     });
 
@@ -64,7 +85,7 @@ app.get("/articles/:id", function(req, res) {
 });
 
 app.get("/clear", function(req, res) {
-  db.Article.remove()
+  db.Article.deleteMany()
   .then(function(data) {
     res.redirect("/");
   })

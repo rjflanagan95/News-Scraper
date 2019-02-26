@@ -23,17 +23,22 @@
                   </a>
                 </div>
                 {{!-- add logic for if author exists --}}
+                {{#if this.author}}
                 <h5>{{this.author}}</h5>
+                {{/if}}
                 <p>
                   {{this.description}}
                 </p>
               </div>
               <div class="col-lg-4">
-                <img src={{this.imageURL}} style="width:165px;height:110px"/>>
+                {{#if this.imageURL}}
+                <img src={{this.imageURL}} style="width:315px;height:210px"/>
+                {{/if}}
               </div>
             </div>
           </div>
         </div>
+        <br>
         {{/each}}
 
       </div>
